@@ -1,3 +1,2 @@
-cmale-build-debug/*
-.idea/*
-
+cmake-build-*/
+.idea/
