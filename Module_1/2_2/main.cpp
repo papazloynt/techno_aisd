@@ -20,38 +20,52 @@ struct Array{
     }
 };
 
-int bin_search(int left, int right, int el, const Array& A) {
-    if (right >= left) {
-        int middle = left + (right - left) / 2;
-        if (el == A.arr[middle]) {
-            if (middle > A.size - 1)
-                return -1;
-            return middle;
-        }
-        if (el > A.arr[middle]) {
-            return bin_search(middle + 1, right, el, A);
-        }
-        return bin_search(left, middle - 1, el, A);
-    }
-    return -1;
+int bin_search(const Array& a, int left, int right) {
+    int mid = left + (right - left) / 2;
+    if (a.arr[mid] > a.arr[mid + 1] &&
+        a.arr[mid] > a.arr[mid - 1])
+        return mid;
+
+    if (a.arr[mid] > a.arr[mid + 1])
+        return bin_search(a, left, mid);
+    return bin_search(a, mid + 1, right);
 }
 
-int exponential_search(int& left, const int el, const Array& A) {
-    if (el <= A.arr[left]) return left;
-    // + 1, чтобы избавиться от бесконечного цикла, когда left = 0;
-    int tmp_right = left + 1;
-    // Чтобы не было выхода за пределы массива A[...]
-    while (tmp_right < A.size && el > A.arr[tmp_right >= A.size ? A.size - 1 : tmp_right]){
-        left = tmp_right;
-        tmp_right *= 2;
+// Search Interval
+int exponential_search(const Array& a) {
+    // check size = 2
+    if (a.size == 1) {
+        if (a.arr[0] < a.arr[1])
+            return 1;
+        return 0;
     }
-    if (tmp_right >= A.size) {
-        tmp_right = A.size - 1;
+
+    // if seq is up always
+    if (a.arr[0] > a.arr[1]) { return 0; }
+
+    // if seq is down always
+    if (a.arr[a.size - 2] < a.arr[a.size - 1]) { return a.size - 1; }
+
+    int tmp_left = 1;
+    while (tmp_left < a.size - 1) {
+        if (a.arr[tmp_left - 1] > a.arr[tmp_left]) {
+            return bin_search(a, tmp_left / 2, tmp_left);
+        } else if (a.arr[tmp_left] > a.arr[tmp_left + 1]) {
+            return tmp_left;
+        } else
+            tmp_left *= 2;
     }
-    return tmp_right;
+    return bin_search(a, tmp_left / 2, a.size - 1);
 }
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
+    int size = 0;
+    std::cin >> size;
+    Array a(size);
+
+    for (int i = 0; i < size; ++i)
+        std::cin >> a.arr[i];
+
+    std::cout << exponential_search(a) << std::endl;
     return 0;
 }
